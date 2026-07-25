@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Viz — Architectural Visualization for Private Homes & Boutique Developments</title>
+<meta name="description" content="Architectural visualization studio based in Porto, Portugal. Renders for private residences, villas and boutique low-rise developments — for architects, interior designers, private clients and developers worldwide.">
+<meta property="og:title" content="Studio Viz — Architectural Visualization">
+<meta property="og:description" content="Visualization for private homes and boutique developments. Based in Porto, working worldwide.">
+<meta property="og:image" content="assets/projects/01-manor-estate/01-manor-estate-01.jpg">
+<meta property="og:type" content="website">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+  :root {
+    --c-text: #f2f2f0;
+    --c-text-dim: #d8d8d6;
+    --c-text-faint: #9a9a97;
+    --c-text-ghost: #6a6a68;
+    --space-lg: 120px;  /* gap between major blocks (hero→intro, stats→work) */
+    --space-md: 56px;   /* gap between related pieces inside one block */
+    --space-sm: 14px;   /* label/kicker to the heading right below it */
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #050505;
+    color: var(--c-text);
+    /* 400 is the reading weight everywhere by default — 300 is reserved
+       for large display type (hero, big statements, quotes), where thin
+       strokes read as elegant instead of low-contrast and hard to read. */
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== NAV ===== */
+  header {
+    position: fixed; top:0; left:0; right:0; z-index: 100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 32px 5vw;
+  }
+  .logo { font-size: 14px; letter-spacing: 2.5px; font-weight: 600; }
+  .header-right { display:flex; align-items:center; gap: 32px; }
+  .header-cta {
+    font-size: 12px; font-weight:400; letter-spacing: .3px; opacity:.85;
+    border-bottom: 1px solid rgba(255,255,255,.35); padding-bottom: 3px;
+  }
+  .menu-btn {
+    width: 22px; display:flex; flex-direction:column; gap: 5px; cursor:pointer;
+    background:none; border:none; padding:0;
+  }
+  .menu-btn span { display:block; height:1px; background:#f2f2f0; opacity:.8; transition: transform .3s, opacity .3s; }
+  .menu-btn.open span:first-child { transform: translateY(3px) rotate(45deg); }
+  .menu-btn.open span:last-child { transform: translateY(-3px) rotate(-45deg); }
+
+  /* ===== NAV DRAWER ===== */
+  .drawer {
+    position: fixed; inset:0; z-index:99;
+    background: #050505;
+    display:flex; flex-direction:column; justify-content:center; gap: 22px;
+    padding: 0 5vw;
+    opacity:0; visibility:hidden; transform: translateY(-8px);
+    transition: opacity .35s ease, transform .35s ease, visibility .35s;
+  }
+  .drawer.open { opacity:1; visibility:visible; transform: translateY(0); }
+  .drawer a { font-size: clamp(28px,5vw,48px); font-weight:300; letter-spacing:-.01em; opacity:.85; }
+  .drawer a:hover { opacity:1; }
+  .drawer .drawer-meta { margin-top: 40px; font-size:13px; opacity:.5; display:flex; gap:24px; }
+
+  /* ===== HERO — full bleed, image speaks ===== */
+  .hero {
+    position: relative; height: 100vh; min-height: 620px;
+    overflow:hidden;
+  }
+  .hero-slides { position:absolute; inset:0; }
+  .hero-slide {
+    position:absolute; inset:0;
+    opacity:0;
+    transition: opacity 1.8s ease;
+  }
+  .hero-slide.active { opacity:1; }
+  .hero-slide img {
+    width:100%; height:100%; object-fit:cover;
+    transform: scale(1.06);
+    transition: transform 7s ease-out;
+  }
+  .hero-slide.active img { transform: scale(1); }
+  .hero::after {
+    content:""; position:absolute; inset:0; z-index:1;
+    background: linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,.05) 55%, rgba(0,0,0,.6) 100%);
+  }
+  .hero-foot {
+    position:absolute; left:0; right:0; bottom:0; z-index:2;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    padding: 0 5vw 40px;
+  }
+  .hero-foot .name { font-size: 11px; font-weight:600; letter-spacing: 1.6px; text-transform:uppercase; opacity:.85; }
+  .hero-foot .name span { display:block; font-size: 11px; font-weight:400; text-transform:none; letter-spacing:.2px; opacity:.55; margin-top: 6px; transition: opacity .5s; }
+  .scroll-mark { font-size: 11px; font-weight:600; letter-spacing: 1.6px; opacity:.55; writing-mode: vertical-rl; }
+  .hero-dots {
+    position:absolute; right: 5vw; top: 50%; transform: translateY(-50%); z-index:2;
+    display:flex; flex-direction:column; gap: 10px;
+  }
+  .hero-dots button {
+    width:6px; height:6px; border-radius:50%; border:none; padding:0; cursor:pointer;
+    background: rgba(255,255,255,.35); transition: background .3s, transform .3s;
+  }
+  .hero-dots button.active { background:#f2f2f0; transform: scale(1.4); }
+  @media (max-width: 860px) { .hero-dots { display:none; } }
+
+  .hero-nav {
+    position:absolute; top:0; bottom:0; width: 22%; z-index:3;
+    background:none; border:none; padding:0; cursor: pointer;
+    display:flex; align-items:center;
+    opacity:0; transition: opacity .3s ease, background .3s ease;
+  }
+  .hero-nav:hover { opacity:1; }
+  .hero-nav .arrow {
+    font-size: 34px; font-weight:300; color:var(--c-text);
+    width: 52px; height: 52px; display:flex; align-items:center; justify-content:center;
+    border: 1px solid rgba(255,255,255,.35); border-radius:50%;
+    background: rgba(5,5,5,.35); backdrop-filter: blur(3px);
+  }
+  .hero-prev { left:0; justify-content:flex-start; padding-left: 3vw; background: linear-gradient(90deg, rgba(0,0,0,.25), transparent); }
+  .hero-next { right:0; justify-content:flex-end; padding-right: 3vw; background: linear-gradient(270deg, rgba(0,0,0,.25), transparent); }
+  @media (max-width: 860px) { .hero-nav { display:none; } }
+
+  /* ===== INTRO / ABOUT — who we are, what we do, how we do it, right under
+     the hero. Same stacked "kicker above content" pattern as every other
+     section (section-head, case-strip) — same left edge, same label gap. */
+  .intro {
+    padding: var(--space-lg) 5vw var(--space-lg);
+  }
+  .intro-label {
+    margin-bottom: var(--space-sm);
+  }
+  .intro-copy h2 {
+    font-size: clamp(24px, 2.6vw, 34px);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+    max-width: 700px;
+    margin-bottom: var(--space-md);
+  }
+  .intro-copy p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--c-text);
+    opacity: .68;
+    max-width: 640px;
+    margin-bottom: 20px;
+  }
+  .intro-copy p:last-child { margin-bottom: 0; }
+  .intro-copy p strong { font-weight: 600; opacity: 1; }
+  @media (max-width: 860px) {
+    .intro { padding: 70px 5vw var(--space-lg); }
+  }
+
+  /* ===== STATS — social proof ===== */
+  .stats-bar {
+    display:flex; gap: 64px; flex-wrap:wrap;
+    margin: var(--space-md) 5vw 0;
+    padding: 44px 0 var(--space-lg);
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .stats-bar .stat b { display:block; font-size: 34px; font-weight:600; letter-spacing:-.01em; }
+  .stats-bar .stat span { font-size: 12px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; opacity:.7; }
+
+  /* ===== GALLERY — project cards, click to open lightbox ===== */
+  .section-head { margin-bottom: var(--space-sm); }
+  .section-head .kicker { margin-bottom: var(--space-sm); }
+  .section-head h2 { font-size: clamp(22px,2.2vw,28px); font-weight:400; line-height:1.35; letter-spacing:-.01em; max-width: 520px; }
+
+  .gallery-wrap { padding: 0 5vw var(--space-lg); }
+  .gallery {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .gallery .card { position:relative; cursor: pointer; border:none; padding:0; background:none; text-align:left; display:block; width:100%; }
+  .gallery .frame {
+    position:relative; width:100%; aspect-ratio: 4/3; overflow:hidden; background:#111;
+  }
+  .gallery img {
+    width:100%; height:100%; object-fit:cover;
+    filter: grayscale(.15) brightness(.94);
+    transition: filter .5s ease, transform 1s cubic-bezier(.16,1,.3,1);
+  }
+  .gallery .card:hover img { filter: grayscale(0) brightness(1); transform: scale(1.03); }
+  .cap {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding: 14px 2px 0;
+    font-size: 12.5px;
+  }
+  .cap .proj { font-weight:400; letter-spacing:.2px; opacity:.9; }
+  .cap .tag { font-weight:400; opacity:.5; }
+  .count-badge {
+    position:absolute; top:14px; right:14px; z-index:2;
+    font-size: 11px; font-weight:400; letter-spacing:.4px; padding: 5px 10px;
+    background: rgba(5,5,5,.55); backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,.15);
+  }
+
+  .gallery .wide { grid-column: span 2; }
+  .gallery .wide .frame { aspect-ratio: 8/5; }
+
+  /* ===== CASE STRIP — proof of outcome. Same left edge and rhythm as the
+     rest of the page — no floating card, so it reads as part of the flow. ===== */
+  .case-strip {
+    padding: 0 5vw var(--space-lg);
+    display:grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items:center;
+  }
+  .case-strip .frame { aspect-ratio: 4/3; overflow:hidden; background:#111; }
+  .case-strip .frame img { width:100%; height:100%; object-fit:cover; }
+  .case-strip .kicker { margin-bottom: var(--space-sm); }
+  .case-strip h3 { font-size: clamp(22px,2.2vw,28px); font-weight:400; line-height:1.35; letter-spacing:-.01em; margin-bottom: var(--space-sm); max-width: 440px; }
+  .case-strip p { font-size: 15px; font-weight:400; line-height:1.6; opacity:.65; max-width: 440px; margin-bottom: 22px; }
+  .case-result { display:flex; gap: 40px; flex-wrap:wrap; }
+  .case-result div b { display:block; font-size: 26px; font-weight:600; letter-spacing:-.01em; }
+  .case-result div span { font-size: 12px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; opacity:.7; }
+
+  /* ===== TESTIMONIAL ===== */
+  .testimonial {
+    margin: 0 5vw var(--space-lg); max-width: 760px;
+  }
+  .testimonial p { font-size: clamp(20px,2vw,26px); font-weight:300; letter-spacing:-.01em; line-height:1.55; opacity:.92; }
+  .testimonial cite { display:block; margin-top: 22px; font-size: 13px; font-weight:400; letter-spacing:normal; opacity:.55; font-style:normal; }
+
+  /* Small uppercase labels (section eyebrows, stat captions, footer titles) —
+     kept large and bright enough to actually read on a near-black background. */
+  .kicker { font-size: 12px; font-weight:600; letter-spacing: 1.2px; text-transform:uppercase; opacity:.7; }
+
+  /* ===== CONTACT ===== */
+  .contact {
+    padding: var(--space-lg) 5vw var(--space-lg);
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .contact-top {
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap: 40px;
+  }
+  .contact-cta {
+    display:block; text-align:left; background:none; border:none; padding:0; cursor:pointer;
+    color: inherit; font-family: inherit;
+    transition: opacity .25s ease;
+  }
+  .contact-cta:hover { opacity:.75; }
+  .contact-cta h2 {
+    font-size: clamp(32px, 5vw, 58px); font-weight:600; letter-spacing:-.02em; max-width: 640px; line-height:1.15;
+  }
+  .contact a.email {
+    font-size: 16px; font-weight:400; opacity:.85; border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 4px;
+  }
+  .contact-channels { display:flex; flex-direction:column; gap: 14px; align-items:flex-end; }
+  .contact-channels .row { display:flex; gap: 18px; font-size: 14px; font-weight:400; opacity:.75; }
+  .contact-note { font-size: 12px; font-weight:400; opacity:.45; text-align:right; margin-top: 6px; }
+
+  /* ===== INQUIRY MODAL ===== */
+  .modal {
+    position:fixed; inset:0; z-index:210;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transition: opacity .3s ease, visibility .3s;
+    padding: 6vh 5vw;
+  }
+  .modal.open { opacity:1; visibility:visible; }
+  .modal-backdrop {
+    position:absolute; inset:0; background: rgba(3,3,3,.85); backdrop-filter: blur(3px);
+  }
+  .modal-card {
+    position:relative; z-index:1; width:100%; max-width: 640px; max-height: 88vh; overflow-y:auto;
+    background:#0c0c0c; border: 1px solid rgba(255,255,255,.1);
+    padding: 48px; transform: translateY(12px); transition: transform .3s ease;
+  }
+  .modal.open .modal-card { transform: translateY(0); }
+  .modal-close {
+    position:absolute; top:20px; right:20px; background:none; border:none; color:var(--c-text);
+    font-size: 26px; font-weight:300; opacity:.6; cursor:pointer; line-height:1;
+  }
+  .modal-close:hover { opacity:1; }
+  .modal-card .kicker { margin-bottom: 14px; }
+  .modal-card h3 {
+    font-size: clamp(20px,2vw,24px); font-weight:400; line-height:1.35; letter-spacing:-.01em;
+    max-width: 460px; margin-bottom: 32px;
+  }
+
+  /* ===== CONTACT FORM (inside modal) ===== */
+  .contact-form { max-width: 720px; }
+  .cf-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 24px; }
+  .cf-field { display:flex; flex-direction:column; gap: 10px; }
+  .cf-field--full { margin-bottom: 30px; }
+  .cf-field span {
+    font-size: 11px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase; opacity:.5;
+  }
+  .cf-field input, .cf-field textarea {
+    font-family:'Inter', sans-serif; font-size: 16px; font-weight:400; color: var(--c-text);
+    background:none; border:none; border-bottom: 1px solid rgba(255,255,255,.2);
+    padding: 8px 2px; resize: vertical; outline:none;
+    transition: border-color .25s ease;
+  }
+  .cf-field input::placeholder, .cf-field textarea::placeholder { color: rgba(242,242,240,.35); }
+  .cf-field input:focus, .cf-field textarea:focus { border-color: rgba(255,255,255,.7); }
+  .cf-submit {
+    font-family:'Inter', sans-serif; font-size: 13px; font-weight:600; letter-spacing:.3px;
+    color:#050505; background: var(--c-text); border:none; cursor:pointer;
+    padding: 14px 30px; transition: opacity .25s ease;
+  }
+  .cf-submit:hover { opacity:.85; }
+  .cf-note { font-size: 12px; opacity:.55; margin-top: 14px; }
+
+  footer {
+    display:grid; grid-template-columns: 1fr 1.4fr auto;
+    gap: 30px; padding: 50px 5vw 34px;
+    font-size: 12.5px; font-weight:400; letter-spacing:.2px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  footer .col-title { font-size: 12px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; opacity:.6; margin-bottom: 10px; }
+  footer .addr { opacity:.6; line-height:1.65; }
+  footer .meta-row { opacity:.6; margin-top: 4px; }
+  footer .meta-row a { opacity:1; }
+  footer .social { display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+  footer .social a { opacity:.6; }
+  footer .social a:hover { opacity:1; }
+  footer .bottom-line {
+    grid-column: 1 / -1; margin-top: 34px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    display:flex; justify-content:space-between; opacity:.4; font-size:11px; flex-wrap:wrap; gap:8px;
+  }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox {
+    position:fixed; inset:0; z-index:200;
+    background: rgba(3,3,3,.97);
+    opacity:0; visibility:hidden; transition: opacity .3s ease, visibility .3s;
+    display:flex; flex-direction:column;
+  }
+  .lightbox.open { opacity:1; visibility:visible; }
+  .lb-top {
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 24px 5vw 0;
+  }
+  .lb-title { font-size: 13px; font-weight:400; letter-spacing:.4px; opacity:.85; }
+  .lb-title .tag { font-weight:400; opacity:.55; margin-left:10px; }
+  .lb-close {
+    background:none; border:none; color:var(--c-text); font-size: 28px; cursor:pointer;
+    line-height:1; opacity:.7; font-weight:300;
+  }
+  .lb-close:hover { opacity:1; }
+  .lb-enquire {
+    font-size: 12px; font-weight:400; letter-spacing:.3px; opacity:.85;
+    border-bottom: 1px solid rgba(255,255,255,.35); padding-bottom: 3px;
+    margin-right: 24px; white-space: nowrap;
+  }
+  .lb-enquire:hover { opacity:1; }
+  .lb-top-right { display:flex; align-items:center; }
+  .lb-stage {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    position:relative; padding: 20px 5vw; min-height:0;
+  }
+  .lb-stage img {
+    max-width:100%; max-height:100%; object-fit:contain;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  }
+  .lb-arrow {
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:#f2f2f0; cursor:pointer;
+    font-size: 32px; opacity:.5; padding: 10px 16px; transition: opacity .25s;
+  }
+  .lb-arrow:hover { opacity:1; }
+  .lb-prev { left: 1vw; }
+  .lb-next { right: 1vw; }
+  .lb-thumbs {
+    display:flex; gap: 8px; padding: 16px 5vw 26px; overflow-x:auto;
+  }
+  .lb-thumbs img {
+    width: 68px; height: 48px; object-fit:cover; cursor:pointer;
+    opacity:.4; transition: opacity .25s, outline .25s; flex-shrink:0;
+  }
+  .lb-thumbs img.active { opacity:1; outline: 1px solid var(--c-text); outline-offset: 2px; }
+  .lb-counter { font-size:11px; font-weight:400; opacity:.45; padding: 0 5vw 18px; text-align:right; }
+
+  @media (max-width: 860px) {
+    .gallery { grid-template-columns: repeat(2, 1fr); }
+    .gallery .wide { grid-column: span 2; }
+    .case-strip { grid-template-columns: 1fr; padding: 0 5vw var(--space-lg); gap: 24px; }
+    footer { grid-template-columns: 1fr; }
+    footer .social { align-items:flex-start; }
+    .lb-arrow { font-size: 24px; padding: 8px; }
+    .lb-enquire { font-size: 11px; margin-right: 14px; }
+    .modal-card { padding: 32px 24px; }
+    .cf-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">STUDIO&nbsp;VIZ</div>
+  <div class="header-right">
+    <a class="header-cta" href="#contact">Get in touch</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span></button>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer">
+  <a href="#work">Work</a>
+  <a href="#about">Studio</a>
+  <a href="#contact">Contact</a>
+  <div class="drawer-meta">
+    <span>hello@studioviz.pt</span>
+    <span>Porto, Portugal</span>
+  </div>
+</nav>
+
+<!-- HERO — private homes, slow crossfade gallery, no clutter -->
+<section class="hero" id="heroSlider">
+  <div class="hero-slides" id="heroSlides"></div>
+  <button class="hero-nav hero-prev" id="heroPrev" aria-label="Previous"><span class="arrow">&#8249;</span></button>
+  <button class="hero-nav hero-next" id="heroNext" aria-label="Next"><span class="arrow">&#8250;</span></button>
+  <div class="hero-dots" id="heroDots"></div>
+  <div class="hero-foot">
+    <div class="name">Architectural Visualization<span id="heroCaption">Private Residences · Boutique Developments</span></div>
+    <div class="scroll-mark">SCROLL</div>
+  </div>
+</section>
+
+<!-- INTRO / ABOUT — who we are, what we do, how we do it, right under the hero -->
+<section class="intro" id="about">
+  <div class="intro-label kicker">About the Studio</div>
+  <div class="intro-copy">
+    <h2>One art director sees every project through, from brief to final frame.</h2>
+    <p><strong>Who we are.</strong> Based in Porto, working worldwide. Every artist here has spent 7+ years exclusively on architectural CGI, so nothing is a first attempt at your expense — no hand-offs between departments, no diluted brief.</p>
+    <p><strong>What we do.</strong> We focus on private homes and boutique low-rise developments — for architects, interior designers, private clients and developers, from the first sketch to the image that gets a project approved, funded, or sold.</p>
+    <p><strong>How we do it.</strong> We work at the edge of the medium: physically grounded lighting and materials, refined with modern tools that speed up iteration without skipping a hand-composed, hand-approved frame. Meeting the deadline is treated as seriously as the image itself.</p>
+  </div>
+</section>
+
+<!-- STATS — social proof, right after the promise -->
+<div class="stats-bar">
+  <div class="stat"><b>60+</b><span>projects completed</span></div>
+  <div class="stat"><b>7 yrs</b><span>in practice</span></div>
+  <div class="stat"><b>12</b><span>countries</span></div>
+  <div class="stat"><b>2 slots</b><span>open for September</span></div>
+</div>
+
+<!-- GALLERY — project cards, click opens lightbox with all photos of that project -->
+<section class="gallery-wrap" id="work">
+  <div class="section-head">
+    <div class="kicker">Selected Work</div>
+    <h2>Private residences and boutique low-rise projects. Click a project to browse the full set.</h2>
+  </div>
+  <div class="gallery" id="galleryGrid"></div>
+</section>
+
+<!-- CASE STRIP — proof of business outcome for the low-rise niche -->
+<section class="case-strip">
+  <div class="frame"><img src="assets/projects/02-boutique-condominium/02-boutique-condominium-04.jpg" alt="Case study — Boutique Condominium"></div>
+  <div>
+    <div class="kicker">Case Study</div>
+    <h3>Helping a boutique developer pre-sell 8 of 10 units before the façade was finished</h3>
+    <p>A low-rise residential project needed strong sales visuals early, while construction was still at foundation stage. We built the full visual set — exteriors, balcony details, interiors — used across the sales site and the on-site presentation suite.</p>
+    <div class="case-result">
+      <div><b>8/10</b><span>units reserved pre-completion</span></div>
+      <div><b>6 wks</b><span>turnaround</span></div>
+      <div><b>15</b><span>final images</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <p>"They turned three rounds of rough sketches into a single image that got our project approved on the first submission — and it later became the cover of our sales brochure."</p>
+  <cite>— Developer feedback, Boutique Condominium project (see case study above)</cite>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-top">
+    <button class="contact-cta" id="contactCta" type="button"><h2>Let's talk about your project.</h2></button>
+    <div class="contact-channels">
+      <a class="email" href="mailto:hello@studioviz.pt">hello@studioviz.pt</a>
+      <div class="row">
+        <a href="tel:+351200000000">+351 200 000 000</a>
+      </div>
+      <div class="contact-note">Replying within a day · 2 new projects open for September</div>
+    </div>
+  </div>
+</section>
+
+<!-- INQUIRY MODAL — opens when "Let's talk about your project." is clicked -->
+<div class="modal" id="contactModal">
+  <div class="modal-backdrop" id="contactModalBackdrop"></div>
+  <div class="modal-card">
+    <button class="modal-close" id="contactModalClose" aria-label="Close">&times;</button>
+    <div class="kicker">Start a project</div>
+    <h3>Tell us a little about it — we'll reply within a day.</h3>
+    <form class="contact-form" id="contactForm">
+      <div class="cf-grid">
+        <label class="cf-field">
+          <span>Name</span>
+          <input type="text" id="cfName" name="name" required>
+        </label>
+        <label class="cf-field">
+          <span>Email</span>
+          <input type="email" name="email" required>
+        </label>
+      </div>
+      <label class="cf-field cf-field--full">
+        <span>Tell us about your project</span>
+        <textarea name="message" rows="4" required placeholder="A few lines: type of project, location, timeline…"></textarea>
+      </label>
+      <button type="submit" class="cf-submit">Send inquiry</button>
+      <div class="cf-note" id="cfNote"></div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div>
+    <div class="col-title">Studio</div>
+    <div class="addr">Edifício Aviz<br>Av. da Boavista 1234, 3º<br>4100-128 Porto, Portugal</div>
+  </div>
+  <div>
+    <div class="col-title">Contact</div>
+    <div class="meta-row"><a href="mailto:hello@studioviz.pt">hello@studioviz.pt</a></div>
+    <div class="meta-row"><a href="tel:+351200000000">+351 200 000 000</a></div>
+  </div>
+  <div class="social">
+    <div class="col-title">Follow</div>
+    <a href="#">Instagram</a>
+    <a href="#">Behance</a>
+    <a href="#">LinkedIn</a>
+  </div>
+  <div class="bottom-line">
+    <span>© 2026 Studio Viz</span>
+    <span>Worldwide, remote-first</span>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-top">
+    <div class="lb-title" id="lbTitle"></div>
+    <div class="lb-top-right">
+      <a class="lb-enquire" id="lbEnquire" href="mailto:hello@studioviz.pt">Enquire about this project</a>
+      <button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
+    </div>
+  </div>
+  <div class="lb-stage">
+    <button class="lb-arrow lb-prev" id="lbPrev" aria-label="Previous">&#8249;</button>
+    <img id="lbImage" src="" alt="">
+    <button class="lb-arrow lb-next" id="lbNext" aria-label="Next">&#8250;</button>
+  </div>
+  <div class="lb-counter" id="lbCounter"></div>
+  <div class="lb-thumbs" id="lbThumbs"></div>
+</div>
+
+<script>
+  // ===== PROJECT DATA =====
+  const PROJECTS = {
+    "manor-estate": {
+      title: "The Manor Estate", tag: "Private Residence",
+      base: "assets/projects/01-manor-estate/01-manor-estate-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg","06.jpg"]
+    },
+    "birch-lake-lodge": {
+      title: "Birch Lake Lodge", tag: "Private Residence",
+      base: "assets/projects/07-birch-lake-lodge/07-birch-lake-lodge-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg","06.jpg","07.jpg"]
+    },
+    "travertine-villa": {
+      title: "Travertine Villa", tag: "Private Residence",
+      base: "assets/projects/05-travertine-villa/05-travertine-villa-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg"]
+    },
+    "boutique-condominium": {
+      title: "Boutique Condominium", tag: "Boutique Development",
+      base: "assets/projects/02-boutique-condominium/02-boutique-condominium-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg"]
+    },
+    "dark-brick-villa": {
+      title: "Dark Brick Villa", tag: "Private Residence",
+      base: "assets/projects/04-dark-brick-villa/04-dark-brick-villa-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg","06.jpg"]
+    },
+    "compact-modern-villa": {
+      title: "Compact Modern Villa", tag: "Private Residence",
+      base: "assets/projects/06-compact-modern-villa/06-compact-modern-villa-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg"]
+    },
+    "lakeside-cabin": {
+      title: "Lakeside Cabin", tag: "Private Residence",
+      base: "assets/projects/03-lakeside-cabin/03-lakeside-cabin-",
+      files: ["01.jpg","02.jpg"]
+    },
+    "lake-resort": {
+      title: "Lakeside Resort", tag: "Large-Scale · Hospitality",
+      base: "assets/projects/09-lake-resort-large-scale/09-lake-resort-large-scale-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg","06.jpg","07.jpg","08.jpg"]
+    },
+    "moscow-towers": {
+      title: "Business Towers", tag: "Large-Scale · Commercial",
+      base: "assets/projects/10-moscow-towers-large-scale/10-moscow-towers-large-scale-",
+      files: ["01.jpg","02.jpg","03.jpg","04.jpg","05.jpg","06.jpg"]
+    }
+  };
+
+  function projectImages(slug) {
+    const p = PROJECTS[slug];
+    return p.files.map(f => p.base + f);
+  }
+
+  // ===== BUILD GALLERY — private homes & low-rise first, larger-scale work after =====
+  const GALLERY_ORDER = [
+    { slug: "birch-lake-lodge", wide: true },
+    { slug: "manor-estate", wide: false },
+    { slug: "travertine-villa", wide: false },
+    { slug: "boutique-condominium", wide: true },
+    { slug: "dark-brick-villa", wide: false },
+    { slug: "compact-modern-villa", wide: false },
+    { slug: "lakeside-cabin", wide: false },
+    { slug: "lake-resort", wide: true },
+    { slug: "moscow-towers", wide: false }
+  ];
+
+  const galleryGrid = document.getElementById('galleryGrid');
+  GALLERY_ORDER.forEach(entry => {
+    const p = PROJECTS[entry.slug];
+    const imgs = projectImages(entry.slug);
+    const fig = document.createElement('figure');
+    if (entry.wide) fig.classList.add('wide');
+    fig.innerHTML = `
+      <button class="card" data-slug="${entry.slug}" data-src="${imgs[0]}">
+        <div class="frame">
+          <img src="${imgs[0]}" alt="${p.title}">
+          ${imgs.length > 1 ? `<div class="count-badge">${imgs.length} photos</div>` : ''}
+        </div>
+        <div class="cap"><span class="proj">${p.title}</span><span class="tag">${p.tag}</span></div>
+      </button>`;
+    galleryGrid.appendChild(fig);
+  });
+
+  // ===== ALL IMAGES ACROSS THE WHOLE GALLERY (flattened, with source project info) — used by the hero slider =====
+  const ALL_IMAGES = [];
+  GALLERY_ORDER.forEach(entry => {
+    const p = PROJECTS[entry.slug];
+    projectImages(entry.slug).forEach(src => {
+      ALL_IMAGES.push({ src, title: p.title, tag: p.tag });
+    });
+  });
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ===== LIGHTBOX — per project: only the photos of the clicked project, so it reads as one project's story =====
+  const lightbox = document.getElementById('lightbox');
+  const lbImage = document.getElementById('lbImage');
+  const lbTitle = document.getElementById('lbTitle');
+  const lbThumbs = document.getElementById('lbThumbs');
+  const lbCounter = document.getElementById('lbCounter');
+  const lbEnquire = document.getElementById('lbEnquire');
+  let currentImages = [];
+  let currentIndex = 0;
+
+  function openLightbox(slug) {
+    const p = PROJECTS[slug];
+    currentImages = projectImages(slug);
+    currentIndex = 0;
+    lbTitle.innerHTML = `${p.title}<span class="tag">${p.tag}</span>`;
+    lbEnquire.href = `mailto:hello@studioviz.pt?subject=${encodeURIComponent('Enquiry — ' + p.title)}`;
+    lbThumbs.innerHTML = currentImages.map((src, i) =>
+      `<img src="${src}" data-i="${i}" class="${i === 0 ? 'active' : ''}">`).join('');
+    renderLbImage();
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function renderLbImage() {
+    lbImage.src = currentImages[currentIndex];
+    lbCounter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
+    Array.from(lbThumbs.children).forEach((t, i) => t.classList.toggle('active', i === currentIndex));
+  }
+  function lbNext() { currentIndex = (currentIndex + 1) % currentImages.length; renderLbImage(); }
+  function lbPrev() { currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length; renderLbImage(); }
+
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('.card[data-slug]');
+    if (card) openLightbox(card.dataset.slug);
+  });
+  lbThumbs.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') { currentIndex = parseInt(e.target.dataset.i, 10); renderLbImage(); }
+  });
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbNext').addEventListener('click', lbNext);
+  document.getElementById('lbPrev').addEventListener('click', lbPrev);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') lbNext();
+    if (e.key === 'ArrowLeft') lbPrev();
+  });
+
+  // ===== INQUIRY MODAL — opens on "Let's talk about your project." =====
+  const contactCta = document.getElementById('contactCta');
+  const contactModal = document.getElementById('contactModal');
+  const contactModalBackdrop = document.getElementById('contactModalBackdrop');
+  const contactModalClose = document.getElementById('contactModalClose');
+  const cfName = document.getElementById('cfName');
+
+  function openContactModal() {
+    contactModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => cfName.focus(), 300);
+  }
+  function closeContactModal() {
+    contactModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if (contactCta) contactCta.addEventListener('click', openContactModal);
+  if (contactModalClose) contactModalClose.addEventListener('click', closeContactModal);
+  if (contactModalBackdrop) contactModalBackdrop.addEventListener('click', closeContactModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && contactModal.classList.contains('open')) closeContactModal();
+  });
+
+  // No backend yet — compose a pre-filled email so nothing gets lost while this is wired up for real.
+  const contactForm = document.getElementById('contactForm');
+  const cfNote = document.getElementById('cfNote');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = contactForm.name.value.trim();
+      const email = contactForm.email.value.trim();
+      const message = contactForm.message.value.trim();
+      const subject = `Project inquiry — ${name || 'New enquiry'}`;
+      const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+      window.location.href = `mailto:hello@studioviz.pt?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      cfNote.textContent = 'Opening your email client to send this — if nothing happens, email us directly at hello@studioviz.pt.';
+    });
+  }
+
+  // ===== HERO CROSSFADE SLIDER — every photo in the gallery, shuffled =====
+  (function () {
+    const heroSlidesWrap = document.getElementById('heroSlides');
+    const heroImages = shuffle(ALL_IMAGES);
+    heroSlidesWrap.innerHTML = heroImages.map((im, i) =>
+      `<div class="hero-slide${i === 0 ? ' active' : ''}" data-caption="${im.title}"><img src="${im.src}" alt="${im.title}"></div>`
+    ).join('');
+
+    const slides = Array.from(document.querySelectorAll('#heroSlider .hero-slide'));
+    const dotsWrap = document.getElementById('heroDots');
+    const caption = document.getElementById('heroCaption');
+    let current = 0;
+    const interval = 6000;
+    let timer;
+
+    // With this many photos, individual dots would fill the whole screen edge — skip them past a threshold.
+    const showDots = slides.length <= 12;
+    if (!showDots) dotsWrap.style.display = 'none';
+
+    slides.forEach((s, i) => {
+      if (!showDots) return;
+      const dot = document.createElement('button');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    function goTo(i) {
+      slides[current].classList.remove('active');
+      if (showDots) dots[current].classList.remove('active');
+      current = i;
+      slides[current].classList.add('active');
+      if (showDots) dots[current].classList.add('active');
+      caption.style.opacity = 0;
+      setTimeout(() => {
+        caption.textContent = slides[current].dataset.caption;
+        caption.style.opacity = .55;
+      }, 400);
+      resetTimer();
+    }
+    function next() { goTo((current + 1) % slides.length); }
+    function prev() { goTo((current - 1 + slides.length) % slides.length); }
+    function resetTimer() { clearInterval(timer); timer = setInterval(next, interval); }
+    resetTimer();
+
+    document.getElementById('heroNext').addEventListener('click', next);
+    document.getElementById('heroPrev').addEventListener('click', prev);
+  })();
+
+  // ===== NAV DRAWER =====
+  const menuBtn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  menuBtn.addEventListener('click', () => {
+    menuBtn.classList.toggle('open');
+    drawer.classList.toggle('open');
+  });
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menuBtn.classList.remove('open');
+    drawer.classList.remove('open');
+  }));
+</script>
+
+</body>
+</html>
